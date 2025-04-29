@@ -43,8 +43,8 @@ def calculate_mean_std(data_path):
     return mean, std
 
 def inverse_normalization(image, mean, std):
-    denormalized = (image * 255).astype(torch.uint8)
     denormalized = (image * std + mean).clamp(0, 1)
+    denormalized = (denormalized * 255).to(torch.uint8)
     return denormalized
 
 def split_image(image: np.ndarray, patch_size=256):
