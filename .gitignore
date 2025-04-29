@@ -7,7 +7,7 @@ data/raw/Planetary/*
 data/raw/Widefield/*
 data/processed/input/*
 data/processed/target/*
-data/packed/*
+data/splits/*
 
 # test cache
 manual_test/
