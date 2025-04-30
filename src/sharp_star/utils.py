@@ -2,14 +2,17 @@ import numpy as np
 import cv2
 import torch
 import os
+import random as rnd
 from torchvision.io import read_image
+from tqdm import tqdm
 
-def calculate_mean_std(data_path):
+def calculate_mean_std(data_path, n_samples: int = 1000):
     """
     Calculates the mean and standard deviation of the dataset located at the specified path.
     Args:
         data_path (str): The file path to the dataset. The dataset should be in a format
                          that can be loaded and processed for statistical calculations.
+        n_samples (str): How many samples to use for the mean and std calculation.
     Returns:
         tuple: A tuple containing two elements:
                - mean (float): The mean value of the dataset.
@@ -24,10 +27,13 @@ def calculate_mean_std(data_path):
     image_names = os.listdir(input_dir)
     if not image_names: raise ValueError("Dataset is empty")
 
+    rnd.shuffle(image_names)
+    image_names = image_names[:n_samples]
+
     mean = torch.zeros(3)
     M2 = torch.zeros(3)
-
-    for image_name in image_names:
+    n_pixels = 0
+    for image_name in tqdm(image_names, desc="Calculating online mean and std"):
         img = read_image(os.path.join(input_dir, image_name)).float() / 255.0
         pixels = img.numel() // 3
         n_pixels += pixels
@@ -39,10 +45,11 @@ def calculate_mean_std(data_path):
     
     variance = M2 / n_pixels - mean**2
     std = torch.sqrt(variance)
-
     return mean, std
 
 def inverse_normalization(image, mean, std):
+    mean = torch.tensor(mean, device=image.device, dtype=image.dtype).view(1, 3, 1, 1)
+    std = torch.tensor(std, device=image.device, dtype=image.dtype).view(1, 3, 1, 1)
     denormalized = (image * std + mean).clamp(0, 1)
     denormalized = (denormalized * 255).to(torch.uint8)
     return denormalized
