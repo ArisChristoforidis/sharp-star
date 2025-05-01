@@ -9,12 +9,8 @@ PYTHON_VERSION = "3.12"
 # Setup commands
 @task
 def create_environment(ctx: Context) -> None:
-    """Create a new conda environment for project."""
-    ctx.run(
-        f"conda create --name {PROJECT_NAME} python={PYTHON_VERSION} pip --no-default-packages --yes",
-        echo=True,
-        pty=not WINDOWS,
-    )
+    """Create a new venv environment for project."""
+    ctx.run("python -m venv .venv", echo=True, pty=not WINDOWS)
 
 @task
 def requirements(ctx: Context) -> None:

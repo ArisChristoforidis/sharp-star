@@ -6,9 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "sharp_star"
 version = "0.0.1"
 description = "Sharp Star is a neural model that sharpens your astro images."
-authors = [
-  { name = "Aris Christoforidis", email = "your@email.com" },
-]
+authors = [{ name = "Aris Christoforidis", email = "your@email.com" }]
 license = { file = "LICENSE" }
 keywords = ["machine learning", "MLOps"]
 classifiers = [
@@ -33,3 +31,7 @@ select = ["I", "N", "E", "W", ]
 
 [tool.coverage.run]
 omit = ["tests/*"]
+
+[project.scripts]
+train = "sharp_star.train:main"
+evaluate = "sharp_star.evaluate:main"
