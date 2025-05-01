@@ -1,10 +1,12 @@
-import numpy as np
-import cv2
-import torch
 import os
 import random as rnd
+
+import cv2
+import numpy as np
+import torch
 from torchvision.io import read_image
 from tqdm import tqdm
+
 
 def calculate_mean_std(data_path, n_samples: int = 1000):
     """
@@ -21,17 +23,19 @@ def calculate_mean_std(data_path, n_samples: int = 1000):
         FileNotFoundError: If the specified file does not exist.
         ValueError: If the dataset is empty or cannot be processed.
     """
-    input_dir = os.path.join(data_path, 'target')
-    if not os.path.exists(input_dir): raise FileNotFoundError(f"Input directory not found: {input_dir}")
-    
+    input_dir = os.path.join(data_path, "target")
+    if not os.path.exists(input_dir):
+        raise FileNotFoundError(f"Input directory not found: {input_dir}")
+
     image_names = os.listdir(input_dir)
-    if not image_names: raise ValueError("Dataset is empty")
+    if not image_names:
+        raise ValueError("Dataset is empty")
 
     rnd.shuffle(image_names)
     image_names = image_names[:n_samples]
 
     mean = torch.zeros(3)
-    M2 = torch.zeros(3)
+    m2 = torch.zeros(3)
     n_pixels = 0
     for image_name in tqdm(image_names, desc="Calculating online mean and std"):
         img = read_image(os.path.join(input_dir, image_name)).float() / 255.0
@@ -41,18 +45,12 @@ def calculate_mean_std(data_path, n_samples: int = 1000):
         img_sum = img.sum(dim=[1, 2])
         delta = img_sum / pixels - mean
         mean += delta * (pixels / n_pixels)
-        M2 += (img ** 2).sum(dim=[1, 2])
-    
-    variance = M2 / n_pixels - mean**2
+        m2 += (img**2).sum(dim=[1, 2])
+
+    variance = m2 / n_pixels - mean**2
     std = torch.sqrt(variance)
     return mean, std
 
-def inverse_normalization(image, mean, std):
-    mean = torch.tensor(mean, device=image.device, dtype=image.dtype).view(1, 3, 1, 1)
-    std = torch.tensor(std, device=image.device, dtype=image.dtype).view(1, 3, 1, 1)
-    denormalized = (image * std + mean).clamp(0, 1)
-    denormalized = (denormalized * 255).to(torch.uint8)
-    return denormalized
 
 def split_image(image: np.ndarray, patch_size=256):
     """
@@ -73,7 +71,7 @@ def split_image(image: np.ndarray, patch_size=256):
 
     for i in range(0, new_h, patch_size):
         for j in range(0, new_w, patch_size):
-            patch = image[i:i + patch_size, j:j + patch_size]
+            patch = image[i : i + patch_size, j : j + patch_size]
             if patch.shape[0] == patch_size and patch.shape[1] == patch_size:
                 patches.append(patch)
 
