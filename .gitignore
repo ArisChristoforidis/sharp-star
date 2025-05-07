@@ -8,6 +8,10 @@ data/raw/Widefield/*
 data/processed/input/*
 data/processed/target/*
 data/splits/*
+data/*
+
+models/*
+notebooks/04-create-reduced-dataset.ipynb
 
 # test cache
 manual_test/
