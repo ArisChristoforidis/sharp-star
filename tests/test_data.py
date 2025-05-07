@@ -1,9 +1,8 @@
 import torch
-from torch.utils.data import Dataset
-from torchvision import transforms
-
 from sharp_star.data import AstroDataset
 from sharp_star.denormalize import Denormalize
+from torch.utils.data import Dataset
+from torchvision import transforms
 
 
 def test_my_dataset():

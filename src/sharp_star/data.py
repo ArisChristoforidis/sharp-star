@@ -38,7 +38,7 @@ class AstroDataset(Dataset):
         return f"AstroDataset with {len(self)} samples. ({self.data_path})"
 
 
-def make_dataset(path: str, mean: torch.Tensor, std: torch.Tensor ) -> AstroDataset:
+def make_dataset(path: str, mean: torch.Tensor, std: torch.Tensor) -> AstroDataset:
     """
     Creates and returns training and evaluation datasets.
     Args:
@@ -51,6 +51,7 @@ def make_dataset(path: str, mean: torch.Tensor, std: torch.Tensor ) -> AstroData
     normalize = transforms.Normalize(mean=mean, std=std)
     dataset = AstroDataset(path, transform=normalize)
     return dataset
+
 
 if __name__ == "__main__":
     typer.run(make_dataset)
