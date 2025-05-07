@@ -15,17 +15,18 @@ class AstroDataset(Dataset):
         self.data_path = data_path
         self.input_path = os.path.join(self.data_path, "input")
         self.target_path = os.path.join(self.data_path, "target")
+        self.file_names = os.listdir(self.input_path)
         self.transform = transform
 
     def __len__(self) -> int:
         """Return the length of the dataset."""
-        # TODO: Remove the limiter.
-        return len(os.listdir(self.input_path)[:100])
+        return len(os.listdir(self.input_path))
 
     def __getitem__(self, index: int):
         """Return a given sample from the dataset."""
-        input_path = os.path.join(self.input_path, f"{index}.jpg")
-        target_path = os.path.join(self.target_path, f"{index}.jpg")
+        file_name = self.file_names[index]
+        input_path = os.path.join(self.input_path, file_name)
+        target_path = os.path.join(self.target_path, file_name)
         input_image = read_image(input_path) / 255.0
         target_image = read_image(target_path) / 255.0
         if self.transform:

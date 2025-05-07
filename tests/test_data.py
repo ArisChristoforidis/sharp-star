@@ -7,7 +7,7 @@ from torchvision import transforms
 
 def test_my_dataset():
     """Test the MyDataset class."""
-    dataset = AstroDataset("data/raw")
+    dataset = AstroDataset("data/reduced/train")
     assert isinstance(dataset, Dataset)
 
 
