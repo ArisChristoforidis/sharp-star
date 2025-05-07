@@ -8,7 +8,7 @@ from torchvision.io import read_image
 from tqdm import tqdm
 
 
-def calculate_mean_std(data_path, n_samples: int = 1000):
+def calculate_mean_std(data_path, n_samples: int = 100):
     """
     Calculates the mean and standard deviation of the dataset located at the specified path.
     Args:
