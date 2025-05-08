@@ -19,3 +19,6 @@ mkdocstrings-python==1.16.10
 # Notebooks
 ipykernel==6.29.5
 ipython==8.36.0
+debugpy==1.8.14
+decorator==5.2.1
+psutil==7.0.0
