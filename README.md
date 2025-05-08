@@ -2,6 +2,13 @@
 
 Sharp Star is a neural model that sharpens your astro images.
 
+# Common commands
+
+- `coverage run -m pytest`: Run the tests to calculate code coverage
+- `coverage report -m`: Show coverage stats from last test run.
+- `ruff check . --fix`: Runs the linter and fixes some things, e.g. the import order.
+- `ruff format <file>`: Formats a single file.
+
 ## Project structure
 
 The directory structure of the project looks like this:
