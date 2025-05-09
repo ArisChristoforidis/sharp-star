@@ -51,8 +51,8 @@ def evaluate(
     model.eval()
     model.to(DEVICE)
 
-    psnr = PeakSignalNoiseRatio()
-    ssim = StructuralSimilarityIndexMeasure()
+    psnr = PeakSignalNoiseRatio().to(DEVICE)
+    ssim = StructuralSimilarityIndexMeasure().to(DEVICE)
 
     eval_loader = DataLoader(eval_set, batch_size=batch_size)
     total_l1, total_psnr, total_ssim = 0, 0, 0
@@ -61,11 +61,11 @@ def evaluate(
             inputs, targets = inputs.to(DEVICE), targets.to(DEVICE)
             preds = model(inputs)
 
-            l1_loss = l1_loss(preds, targets)
+            loss_l1 = l1_loss(preds, targets)
             psnr_val = psnr(preds, targets)
             ssim_val = ssim(preds, targets)
 
-            total_l1 += l1_loss.item()
+            total_l1 += loss_l1.item()
             total_psnr += psnr_val.item()
             total_ssim += ssim_val.item()
 

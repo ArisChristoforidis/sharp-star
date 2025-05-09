@@ -41,17 +41,22 @@ def train(
         mean = torch.tensor(checkpoint_data["mean"])
         std = torch.tensor(checkpoint_data["std"])
         start_epoch = checkpoint_data["epoch"]
+        wandb_id = checkpoint_data["wandb_id"]
         print(f"Resuming from checkpoint {checkpoint} [{start_epoch} Epoch(s)]")
     else:
         start_epoch = 0
         mean, std = calculate_mean_std(train_path)
+        wandb_id = None
 
     train_set = make_dataset(train_path, mean, std)
     train_loader = DataLoader(train_set, batch_size=batch_size)
 
     if log_metrics:
         metrics = wandb.init(
-            project="sharp_star", config={"architecture": "UNet", "lr": lr, "batch_size": batch_size, "epochs": epochs}
+            project="sharp_star",
+            resume="allow",
+            id=wandb_id,
+            config={"architecture": "UNet", "lr": lr, "batch_size": batch_size, "epochs": epochs},
         )
 
     for epoch in range(start_epoch, start_epoch + epochs):
@@ -68,12 +73,18 @@ def train(
             loss.backward()
             optimizer.step()
 
-        torch.save(
+        new_checkpoint = (
             {"model_state_dict": model.state_dict(), "epoch": epoch, "mean": mean.tolist(), "std": std.tolist()},
+        )
+        if log_metrics:
+            new_checkpoint["wandb_id"] = metrics.id
+
+        torch.save(
+            new_checkpoint,
             output_path,
         )
         # Evaluate and log.
-        eval_l1, psnr, ssim = evaluate(model_path=output_path, verbose=False)
+        eval_l1, psnr, ssim = evaluate(model_path=output_path, eval_path=eval_path, verbose=False)
 
         if log_metrics:
             metrics.log(
