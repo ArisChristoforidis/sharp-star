@@ -37,6 +37,7 @@ def train(
     if checkpoint:
         checkpoint_data = torch.load(checkpoint, map_location="cpu")
         model.load_state_dict(checkpoint_data["model_state_dict"])
+        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         mean = torch.tensor(checkpoint_data["mean"])
         std = torch.tensor(checkpoint_data["std"])
         start_epoch = checkpoint_data["epoch"]
@@ -47,7 +48,7 @@ def train(
         mean, std = calculate_mean_std(train_path)
         wandb_id = None
 
-    model = torch.compile(model)
+    # model = torch.compile(model)
     model = model.to(DEVICE)
 
     train_set = make_dataset(train_path, mean, std)
@@ -76,7 +77,13 @@ def train(
             optimizer.step()
 
         new_checkpoint = (
-            {"model_state_dict": model.state_dict(), "epoch": epoch, "mean": mean.tolist(), "std": std.tolist()},
+            {
+                "model_state_dict": model.state_dict(),
+                "optimizer_state_dict": optimizer.state_dict(),
+                "epoch": epoch,
+                "mean": mean.tolist(),
+                "std": std.tolist(),
+            },
         )
 
         if log_metrics:
