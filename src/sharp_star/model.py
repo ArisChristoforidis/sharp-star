@@ -43,8 +43,6 @@ class Up(nn.Module):
 
 
 class UNet(nn.Module):
-    """Just a dummy model to show how to structure your code"""
-
     def __init__(self, in_channels: int, out_channels: int, base_features: int = 32):
         super(UNet, self).__init__()
 

@@ -31,7 +31,6 @@ def train(
     log_metrics: bool = True,
 ) -> None:
     model = UNet(in_channels=3, out_channels=3)
-    model = model.to(DEVICE)
     optimizer = Adam(model.parameters(), lr=lr)
     l1_loss = L1Loss()
 
@@ -47,6 +46,9 @@ def train(
         start_epoch = 0
         mean, std = calculate_mean_std(train_path)
         wandb_id = None
+
+    model = torch.compile(model)
+    model = model.to(DEVICE)
 
     train_set = make_dataset(train_path, mean, std)
     train_loader = DataLoader(train_set, batch_size=batch_size)
