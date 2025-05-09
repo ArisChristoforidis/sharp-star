@@ -49,6 +49,7 @@ def evaluate(
     eval_set = make_dataset(eval_path, mean, std)
 
     model.eval()
+    model = torch.compile(model)
     model.to(DEVICE)
 
     psnr = PeakSignalNoiseRatio().to(DEVICE)
