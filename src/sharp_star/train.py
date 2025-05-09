@@ -27,7 +27,7 @@ def train(
     output_path: Annotated[str, typer.Option("--output", "-o")] = "models/model.pth",
     lr: float = 1e-3,
     batch_size: int = 32,
-    epochs: int = 20,
+    epochs: int = 10,
     log_metrics: bool = True,
 ) -> None:
     model = UNet(in_channels=3, out_channels=3)
@@ -76,15 +76,13 @@ def train(
             loss.backward()
             optimizer.step()
 
-        new_checkpoint = (
-            {
-                "model_state_dict": model.state_dict(),
-                "optimizer_state_dict": optimizer.state_dict(),
-                "epoch": epoch,
-                "mean": mean.tolist(),
-                "std": std.tolist(),
-            },
-        )
+        new_checkpoint = {
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+            "epoch": epoch,
+            "mean": mean.tolist(),
+            "std": std.tolist(),
+        }
 
         if log_metrics:
             new_checkpoint["wandb_id"] = metrics.id
