@@ -78,6 +78,7 @@ def train(
         new_checkpoint = (
             {"model_state_dict": model.state_dict(), "epoch": epoch, "mean": mean.tolist(), "std": std.tolist()},
         )
+
         if log_metrics:
             new_checkpoint["wandb_id"] = metrics.id
 
