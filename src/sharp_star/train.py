@@ -7,6 +7,7 @@ from evaluate import evaluate
 from model import UNet
 from torch.nn import L1Loss
 from torch.optim import Adam
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from utils import calculate_mean_std
@@ -50,6 +51,8 @@ def train(
         wandb_id = None
         model = model.to(DEVICE)
 
+    scheduler = ReduceLROnPlateau(optimizer, "min")
+
     train_set = make_dataset(train_path, mean, std)
     train_loader = DataLoader(train_set, batch_size=batch_size)
 
@@ -74,6 +77,7 @@ def train(
             # Back pass
             loss.backward()
             optimizer.step()
+        scheduler.step()
 
         new_checkpoint = {
             "model_state_dict": model.state_dict(),
