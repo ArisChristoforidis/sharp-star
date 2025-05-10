@@ -4,6 +4,7 @@ import random as rnd
 import cv2
 import numpy as np
 import torch
+from torch.nn.functional import pad
 from torchvision.io import read_image
 from tqdm import tqdm
 
@@ -63,16 +64,18 @@ def split_image(image: np.ndarray, patch_size=256):
     Returns:
     - List of patches (list of numpy arrays).
     """
-    h, w = image.shape[:2]
+    c, h, w = image.shape
     new_h = ((h + patch_size - 1) // patch_size) * patch_size
     new_w = ((w + patch_size - 1) // patch_size) * patch_size
-    image = cv2.copyMakeBorder(image, 0, new_h - h, 0, new_w - w, cv2.BORDER_CONSTANT, value=0)
+    print(image.shape)
+    padded_image = pad(image, (0, new_w - w, 0, new_h - h), mode="constant", value=0)
+    # padded_image = cv2.copyMakeBorder(image, 0, new_h - h, 0, new_w - w, cv2.BORDER_CONSTANT, value=0)
     patches = []
 
     for i in range(0, new_h, patch_size):
         for j in range(0, new_w, patch_size):
-            patch = image[i : i + patch_size, j : j + patch_size]
-            if patch.shape[0] == patch_size and patch.shape[1] == patch_size:
+            patch = padded_image[:, i : i + patch_size, j : j + patch_size]
+            if patch.shape[1] == patch_size and patch.shape[2] == patch_size:
                 patches.append(patch)
 
     return patches
