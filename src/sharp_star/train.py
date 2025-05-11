@@ -48,7 +48,7 @@ def train(
         mean = torch.tensor(checkpoint_data["mean"])
         std = torch.tensor(checkpoint_data["std"])
 
-        start_epoch = checkpoint_data["epoch"]
+        start_epoch = checkpoint_data["epoch"] + 1
         wandb_id = checkpoint_data["wandb_id"]
         print(f"Resuming from checkpoint {checkpoint} [{start_epoch} Epoch(s)]")
     else:
@@ -57,7 +57,16 @@ def train(
         wandb_id = None
 
     original_model = original_model.to(DEVICE)
-    compiled_model = torch.compile(compiled_model)
+    compiled_model = torch.compile(original_model)
+
+    # Check if optimizer_state_dict was actually loaded.
+    if checkpoint:
+        print(f"Moving optimizer state to {DEVICE}...")
+        for state in optimizer.state.values():
+            for k, v in state.items():
+                if isinstance(v, torch.Tensor):
+                    state[k] = v.to(DEVICE)
+        print(f"Optimizer state successfully moved to {DEVICE}.")
 
     train_set = make_dataset(train_path, mean, std)
     train_loader = DataLoader(train_set, batch_size=batch_size, num_workers=4)
