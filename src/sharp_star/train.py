@@ -24,24 +24,30 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.ba
 def train(
     checkpoint: Annotated[str, typer.Option("--checkpoint", "-c")] = None,
     train_path: Annotated[str, typer.Option("--train", "-t")] = "data/reduced/train",
-    eval_path: Annotated[str, typer.Option("--eval", "-e")] = "data/reduced/eval",
+    eval_path: Annotated[str, typer.Option("--eval", "-v")] = "data/reduced/eval",
     output_path: Annotated[str, typer.Option("--output", "-o")] = "models/model.pth",
-    lr: float = 1e-3,
-    batch_size: int = 32,
-    epochs: int = 10,
-    log_metrics: bool = True,
+    lr: Annotated[float, typer.Option("--learning_rate", "-lr")] = 1e-3,
+    batch_size: Annotated[int, typer.Option("--batch", "-b")] = 32,
+    epochs: Annotated[int, typer.Option("--epochs", "-e")] = 10,
+    log_metrics: Annotated[bool, typer.Option("--log", "-l")] = True,
 ) -> None:
-    model = UNet(in_channels=3, out_channels=3)
-    optimizer = Adam(model.parameters(), lr=lr)
+    original_model = UNet(in_channels=3, out_channels=3)
+    optimizer = Adam(original_model.parameters(), lr=lr)
+    scheduler = ReduceLROnPlateau(optimizer, "min")
+    scaler = torch.GradScaler(device=str(DEVICE))
     l1_loss = L1Loss()
 
     if checkpoint:
         checkpoint_data = torch.load(checkpoint, map_location="cpu")
-        model.load_state_dict(checkpoint_data["model_state_dict"])
-        model = model.to(DEVICE)
+
+        original_model.load_state_dict(checkpoint_data["model_state_dict"])
         optimizer.load_state_dict(checkpoint_data["optimizer_state_dict"])
+        scheduler.load_state_dict(checkpoint_data["scheduler_state_dict"])
+        scaler.load_state_dict(checkpoint_data["scaler_state_dict"])
+
         mean = torch.tensor(checkpoint_data["mean"])
         std = torch.tensor(checkpoint_data["std"])
+
         start_epoch = checkpoint_data["epoch"]
         wandb_id = checkpoint_data["wandb_id"]
         print(f"Resuming from checkpoint {checkpoint} [{start_epoch} Epoch(s)]")
@@ -49,12 +55,12 @@ def train(
         start_epoch = 0
         mean, std = calculate_mean_std(train_path)
         wandb_id = None
-        model = model.to(DEVICE)
 
-    scheduler = ReduceLROnPlateau(optimizer, "min")
+    original_model = original_model.to(DEVICE)
+    compiled_model = torch.compile(compiled_model)
 
     train_set = make_dataset(train_path, mean, std)
-    train_loader = DataLoader(train_set, batch_size=batch_size)
+    train_loader = DataLoader(train_set, batch_size=batch_size, num_workers=4)
 
     if log_metrics:
         metrics = wandb.init(
@@ -65,23 +71,27 @@ def train(
         )
 
     for epoch in range(start_epoch, start_epoch + epochs):
-        model.train()
+        original_model.train()
         for i, (input_image, target_image) in tqdm(
             enumerate(train_loader), desc=f"Training epoch {epoch+1}", total=len(train_loader)
         ):
             input_image, target_image = input_image.to(DEVICE), target_image.to(DEVICE)
             optimizer.zero_grad()
             # Forward pass
-            pred_image = model(input_image)
-            loss = l1_loss(pred_image, target_image)
+            with torch.autocast(device_type=str(DEVICE), dtype=torch.float16):
+                pred_image = compiled_model(input_image)
+                loss = l1_loss(pred_image, target_image)
+
             # Back pass
-            loss.backward()
-            optimizer.step()
-        scheduler.step()
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
 
         new_checkpoint = {
-            "model_state_dict": model.state_dict(),
+            "model_state_dict": original_model.state_dict(),
             "optimizer_state_dict": optimizer.state_dict(),
+            "scheduler_state_dict": scheduler.state_dict(),
+            "scaler_state_dict": scaler.state_dict(),
             "epoch": epoch,
             "mean": mean.tolist(),
             "std": std.tolist(),
@@ -96,6 +106,7 @@ def train(
         )
         # Evaluate and log.
         eval_l1, psnr, ssim = evaluate(model_path=output_path, eval_path=eval_path, verbose=False)
+        scheduler.step(eval_l1)
 
         if log_metrics:
             metrics.log(

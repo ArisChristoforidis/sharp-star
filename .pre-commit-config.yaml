@@ -15,7 +15,10 @@ repos:
         # try to fix what is possible
     -   id: ruff
         args: ["--fix"]
+        stages: [pre-commit]
         # perform formatting updates
     -   id: ruff-format
+        stages: [pre-commit]
         # validate if all is fine with preview mode
     -   id: ruff
+        stages: [pre-commit]
