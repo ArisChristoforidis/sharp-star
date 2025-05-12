@@ -85,6 +85,6 @@ update-checker==0.18.0
 urllib3==2.4.0
 uvicorn==0.34.2
 virtualenv==20.31.1
-wandb==0.19.10
+wandb==0.19.11
 wcwidth==0.2.13
 websocket-client==1.8.0
