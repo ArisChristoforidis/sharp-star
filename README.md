@@ -50,15 +50,13 @@ Run `predict.py` to perform inference on an image.
 __Options__
 
 
-`--input`, `-i`:  Path to the input image.
-
-`--output`, `-o`: Path to save the output (predicted) image.
-
-`--model`, `-m`: Path to the trained model file.
-
-`--batch`, `-b`: Batch size for processing the image.
-
-`--patch`, `-p`: Size of the image patches used for processing.
+| Args | Description                                     |
+|--------------|-------------------------------------------------|
+| `--input`    | Path to the input image.                       |
+| `--output`   | Path to save the output (predicted) image.      |
+| `--model`    | Path to the trained model file.                 |
+| `--batch`    | Batch size for processing the image.            |
+| `--patch`    | Size of the image patches used for processing. |
 
 __Example__
 
@@ -72,21 +70,16 @@ You can use `train.py` to train your own model.
 
 __Options__
 
-`--checkpoint`, `-c`:  The path to the model checkpoint if it exists.
-
-`--train`, `-t`: The path to the train set.
-
-`--eval`, `-v`: The path to the evaluation set.
-
-`--output`, `-o`: The output path for the model.
-
-`--learning_rate`, `-lr`: The default learning rate.
-
-`--batch`, `-b`: The batch size.
-
-`--epochs`, `-e`: The number of epochs to train for.
-
-`--log`, `-l`: Whether to log metrics to wandb or not.
+| Args    | Description                                  |
+|-----------------|----------------------------------------------|
+| `--checkpoint`  | The path to the model checkpoint if it exists. |
+| `--train`       | The path to the train set.                   |
+| `--eval`        | The path to the evaluation set.              |
+| `--output`      | The output path for the model.               |
+| `--learning_rate`| The default learning rate.                   |
+| `--batch`       | The batch size.                              |
+| `--epochs`      | The number of epochs to train for.           |
+| `--log`         | Whether to log metrics to wandb or not.      |
 
 __Example__
 
@@ -94,6 +87,21 @@ __Example__
 python train.py --checkpoint models/model.pth --train data/train --eval data/eval output models/updated_model.pth --learning_rate 0.001 --batch 32 --epochs 20 --log True
 ```
 
+## Dataset
+
+I created the dataset by scraping the `r/astrophotography` subreddit. While I don't provide the training data in the repo, you can use `01-fetch-dataset.ipynb` in the `notebooks` folder to download and organize a similar dataset. You may also run `02-process-images.ipynb` and `03-split-data.ipynb` in that order to get the data ready for training.
+
+_Note_: I use [__PRAW__](https://github.com/praw-dev/praw) to fetch data from Reddit. You will need to setup a __REDDIT API KEY__ and place it in an .env folder. Here is how that should look like:
+
+```
+REDDIT_CLIENT_ID=
+REDDIT_CLIENT_SECRET=
+REDDIT_USER_AGENT=
+REDDIT_USERNAME=
+REDDIT_PASSWORD=
+```
+
+You can get more info on configuring PRAW [here](https://praw.readthedocs.io/en/stable/getting_started/authentication.html)
 # Common commands
 
 - `coverage run -m pytest`: Run the tests to calculate code coverage
