@@ -46,7 +46,7 @@ pillow==11.2.1
 platformdirs==4.3.7
 pluggy==1.5.0
 praw==7.8.1
-prawcore==2.4.0
+prawcore==3.0.2
 pre_commit==4.2.0
 prompt_toolkit==3.0.51
 protobuf==6.30.2
