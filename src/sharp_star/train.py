@@ -6,7 +6,6 @@ import typer
 from evaluate import evaluate
 from model import UNet
 from torch.nn import L1Loss
-from torch.nn.utils import clip_grad_norm_
 from torch.optim import Adam
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader
@@ -35,7 +34,6 @@ def train(
     original_model = UNet(in_channels=3, out_channels=3)
     optimizer = Adam(original_model.parameters(), lr=lr)
     scheduler = ReduceLROnPlateau(optimizer, "min")
-    scaler = torch.GradScaler(device=str(DEVICE))
     l1_loss = L1Loss()
 
     if checkpoint:
@@ -44,7 +42,6 @@ def train(
         original_model.load_state_dict(checkpoint_data["model_state_dict"])
         optimizer.load_state_dict(checkpoint_data["optimizer_state_dict"])
         scheduler.load_state_dict(checkpoint_data["scheduler_state_dict"])
-        scaler.load_state_dict(checkpoint_data["scaler_state_dict"])
 
         mean = torch.tensor(checkpoint_data["mean"])
         std = torch.tensor(checkpoint_data["std"])
@@ -88,22 +85,17 @@ def train(
             input_image, target_image = input_image.to(DEVICE), target_image.to(DEVICE)
             optimizer.zero_grad()
             # Forward pass
-            with torch.autocast(device_type=str(DEVICE), dtype=torch.float16):
-                pred_image = compiled_model(input_image)
-                loss = l1_loss(pred_image, target_image)
+            pred_image = compiled_model(input_image)
+            loss = l1_loss(pred_image, target_image)
 
             # Back pass
-            scaler.scale(loss).backward()
-            scaler.unscale_(optimizer)
-            clip_grad_norm_(original_model.parameters(), 1.0)
-            scaler.step(optimizer)
-            scaler.update()
+            loss.backward()
+            optimizer.step()
 
         new_checkpoint = {
             "model_state_dict": original_model.state_dict(),
             "optimizer_state_dict": optimizer.state_dict(),
             "scheduler_state_dict": scheduler.state_dict(),
-            "scaler_state_dict": scaler.state_dict(),
             "epoch": epoch,
             "mean": mean.tolist(),
             "std": std.tolist(),
