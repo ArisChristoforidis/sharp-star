@@ -26,7 +26,7 @@ def vizualize(
         images.append(ground_truth_image)
         image_titles.append("Ground Truth")
 
-    _, axes = plt.subplots(1, 3)
+    _, axes = plt.subplots(1, len(images))
     for axis, img, title in zip(axes, images, image_titles):
         axis.imshow(img)
         axis.set_title(title)
