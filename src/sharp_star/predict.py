@@ -66,12 +66,12 @@ def predict(
     out_image = stitch_image(image.shape, output_patches, patch_size)
 
     out_image = output_transform(out_image)
-    image_to_save = (out_image * 255).clamp(0, 255).byte()
-    pil_image = to_pil_image(image_to_save)
     if output_path:
+        image_to_save = (out_image * 255).clamp(0, 255).byte()
+        pil_image = to_pil_image(image_to_save)
         pil_image.save(output_path)
-    else:
-        pil_image.show()
+
+    return out_image
 
 
 if __name__ == "__main__":
