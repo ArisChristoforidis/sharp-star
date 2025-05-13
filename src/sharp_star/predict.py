@@ -32,8 +32,8 @@ def stitch_image(original_shape: Tuple[int, int], patches: List[torch.tensor], p
 
 @app.command()
 def predict(
-    image_path: Annotated[str, typer.Option("--input", "-i")] = "data/splits/test/input/0.jpg",
-    output_path: Annotated[str, typer.Option("--output", "-o")] = "out.jpg",
+    image_path: Annotated[str, typer.Option("--input", "-i")] = "data/splits/test/input/36.jpg",
+    output_path: Annotated[str | None, typer.Option("--output", "-o")] = None,
     model_path: Annotated[str, typer.Option("--model", "-m")] = "models/model.pth",
     batch_size: Annotated[int, typer.Option("--batch", "-b")] = 8,
     patch_size: Annotated[int, typer.Option("--patch", "-p")] = 256,
@@ -62,13 +62,16 @@ def predict(
         with torch.no_grad():
             out = model(batch)
 
-        output_patches.extend(out.flip(0))
+        output_patches.extend(out.unbind(0))
     out_image = stitch_image(image.shape, output_patches, patch_size)
 
     out_image = output_transform(out_image)
     image_to_save = (out_image * 255).clamp(0, 255).byte()
     pil_image = to_pil_image(image_to_save)
-    pil_image.save(output_path)
+    if output_path:
+        pil_image.save(output_path)
+    else:
+        pil_image.show()
 
 
 if __name__ == "__main__":

@@ -69,7 +69,6 @@ def split_image(image: np.ndarray, patch_size=256):
     new_w = ((w + patch_size - 1) // patch_size) * patch_size
     print(image.shape)
     padded_image = pad(image, (0, new_w - w, 0, new_h - h), mode="constant", value=0)
-    # padded_image = cv2.copyMakeBorder(image, 0, new_h - h, 0, new_w - w, cv2.BORDER_CONSTANT, value=0)
     patches = []
 
     for i in range(0, new_h, patch_size):

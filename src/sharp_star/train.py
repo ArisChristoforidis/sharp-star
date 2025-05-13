@@ -6,7 +6,7 @@ import typer
 from evaluate import evaluate
 from model import UNet
 from torch.nn import L1Loss
-from torch.nn.utils import clip, clip_grad_norm_
+from torch.nn.utils import clip_grad_norm_
 from torch.optim import Adam
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader
