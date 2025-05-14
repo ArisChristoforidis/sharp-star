@@ -1,25 +1,27 @@
-# 🚧 Sharp Star ✨ 🚧
+![](images/cover.png)
 
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Python Version](https://img.shields.io/badge/Python-%3E=3.10-blue.svg)](https://www.python.org/downloads/)
-![Tests](https://github.com/ArisChristoforidis/sharp-star/actions/workflows/tests.yaml/badge.svg?style=social)
-![Last Commit](https://img.shields.io/github/last-commit/ArisChristoforidis/sharp-star)
-![Open Issues](https://img.shields.io/github/issues/ArisChristoforidis/sharp-star)
 ![Framework](https://img.shields.io/badge/framework-PyTorch-red)
 ![Model](https://img.shields.io/badge/model-UNet-blue)
 ![Status](https://img.shields.io/badge/status-training-informational)
+[![Python Version](https://img.shields.io/badge/Python-%3E=3.10-blue.svg)](https://www.python.org/downloads/)
+![Tests](https://github.com/ArisChristoforidis/sharp-star/actions/workflows/tests.yaml/badge.svg?style=social)
+![Last Commit](https://img.shields.io/github/last-commit/ArisChristoforidis/sharp-star)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-### Sharp Star is a neural model that sharpens and deblurs your astro images.
+### Sharp Star ✨ is a neural model that sharpens and deblurs your astro images.
 
 ## Table of Contents
 
-* [Installation](#installation)
-* [Usage](#usage)
-* [Dataset](#dataset)
-* [Evaluation](#evaluation)
-* [Results](#results)
-* [License](#license)
-* [Contact](#contact)
+- [Table of Contents](#table-of-contents)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Inference](#inference)
+  - [Training](#training)
+  - [Visualization](#visualization)
+- [Dataset](#dataset)
+- [Evaluation](#evaluation)
+- [Results](#results)
+- [Licence](#licence)
 
 ## Installation
 
@@ -138,57 +140,7 @@ Below you can see some examples of model outputs compared to the input and groun
 
 ![](reports/figures/figure1.png)
 Image Credit: [/u/carnage-chambers](https://www.reddit.com/r/astrophotography/comments/1k22wvz/the_merging_antennae_galaxies_in_corvus_ngc/)
-# Common commands
 
-- `coverage run -m pytest`: Run the tests to calculate code coverage
-- `coverage report -m`: Show coverage stats from last test run.
-- `ruff check . --fix`: Runs the linter and fixes some things, e.g. the import order.
-- `ruff format <file>`: Formats a single file.
+## Licence
 
-## Project structure
-
-The directory structure of the project looks like this:
-```txt
-├── .github/                  # Github actions and dependabot
-│   ├── dependabot.yaml
-│   └── workflows/
-│       └── tests.yaml
-├── data/                     # Data directory
-│   ├── processed
-│   └── raw
-├── docs/                     # Documentation
-│   ├── mkdocs.yml
-│   └── source/
-│       └── index.md
-├── models/                   # Trained models
-├── notebooks/                # Jupyter notebooks
-├── reports/                  # Reports
-│   └── figures/
-├── src/                      # Source code
-│   ├── project_name/
-│   │   ├── __init__.py
-│   │   ├── api.py
-│   │   ├── data.py
-│   │   ├── evaluate.py
-│   │   ├── models.py
-│   │   ├── train.py
-│   │   └── visualize.py
-└── tests/                    # Tests
-│   ├── __init__.py
-│   ├── test_api.py
-│   ├── test_data.py
-│   └── test_model.py
-├── .gitignore
-├── .pre-commit-config.yaml
-├── LICENSE
-├── pyproject.toml            # Python project file
-├── README.md                 # Project README
-├── requirements.txt          # Project requirements
-├── requirements_dev.txt      # Development requirements
-└── tasks.py                  # Project tasks
-```
-
-
-Created using [mlops_template](https://github.com/SkafteNicki/mlops_template),
-a [cookiecutter template](https://github.com/cookiecutter/cookiecutter) for getting
-started with Machine Learning Operations (MLOps).
+MIT
