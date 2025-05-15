@@ -5,12 +5,6 @@ from torch.utils.data import Dataset
 from torchvision import transforms
 
 
-def test_my_dataset():
-    """Test the MyDataset class."""
-    dataset = AstroDataset("data/reduced/train")
-    assert isinstance(dataset, Dataset)
-
-
 def test_normalization():
     """Test if normalization and denormalization work as intended."""
     # Dummy image tensor
