@@ -17,6 +17,16 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.ba
 
 
 def stitch_image(original_shape: Tuple[int, int], patches: List[torch.tensor], patch_size: int):
+    """
+    Reconstructs an image from a list of patches.
+    Args:
+        original_shape (Tuple[int, int]): The shape of the original image as (channels, height, width).
+        patches (List[torch.Tensor]): A list of image patches as tensors, each of shape (channels, patch_size, patch_size).
+        patch_size (int): The size of each square patch.
+    Returns:
+        torch.Tensor: The reconstructed image tensor of shape (channels, height, width), cropped to the original size.
+    """
+
     channels, height, width = original_shape
 
     patches = torch.stack(patches)
@@ -32,12 +42,23 @@ def stitch_image(original_shape: Tuple[int, int], patches: List[torch.tensor], p
 
 @app.command()
 def predict(
-    image_path: Annotated[str, typer.Option("--input", "-i")] = "data/splits/test/input/36.jpg",
-    output_path: Annotated[str | None, typer.Option("--output", "-o")] = None,
-    model_path: Annotated[str, typer.Option("--model", "-m")] = "models/model.pth",
+    image_path: Annotated[str, typer.Option("--input", "-i")],
+    output_path: Annotated[str | None, typer.Option("--output", "-o")],
+    model_path: Annotated[str, typer.Option("--model", "-m")],
     batch_size: Annotated[int, typer.Option("--batch", "-b")] = 8,
     patch_size: Annotated[int, typer.Option("--patch", "-p")] = 256,
 ) -> None:
+    """
+    Runs inference on an input image using a pre-trained UNet model, processes the image in patches, and optionally saves the output.
+    Args:
+        image_path (str): Path to the input image file.
+        output_path (str | None): Path to save the output image. If None, the output is not saved.
+        model_path (str): Path to the trained model checkpoint (.pth file).
+        batch_size (int): Number of patches to process in a batch during inference.
+        patch_size (int): Size of the square patches to split the image into.
+    Returns:
+        torch.Tensor: The output image tensor after model inference and denormalization.
+    """
     checkpoint = torch.load(model_path, map_location="cpu")
 
     model = UNet(in_channels=3, out_channels=3)

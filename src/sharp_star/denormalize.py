@@ -17,5 +17,5 @@ class Denormalize(object):
         self.mean = mean.view(3, 1, 1)
         self.std = std.view(3, 1, 1)
 
-    def __call__(self, sample):
+    def __call__(self, sample: torch.Tensor):
         return sample * self.std + self.mean

@@ -1,5 +1,5 @@
 import os
-from typing import Tuple
+from typing import List
 
 import torch
 import typer
@@ -9,9 +9,13 @@ from torchvision.io import read_image
 
 
 class AstroDataset(Dataset):
-    """My custom dataset."""
+    """An Astrophotography image to image dataset.
+    Args:
+        data_path (str): Path to the data. Should contain 'input' and 'target' subdirectories.
+        transform (List[torch.nn.Module] | None): A list of transforms to apply to the images.
+    """
 
-    def __init__(self, data_path: str, transform=None) -> None:
+    def __init__(self, data_path: str, transform: List[torch.nn.Module] = None) -> None:
         self.data_path = data_path
         self.input_path = os.path.join(self.data_path, "input")
         self.target_path = os.path.join(self.data_path, "target")

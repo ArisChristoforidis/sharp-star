@@ -8,7 +8,9 @@
 ![Last Commit](https://img.shields.io/github/last-commit/ArisChristoforidis/sharp-star)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-### Sharp Star ✨ is a neural model that sharpens and deblurs your astro images.
+__Sharp Star__ is a denoising and sharpening neural model for astrophotography imagery. Built with PyTorch and based on a UNet architecture, it enhances a wide range of targets including deep sky objects, galaxies, planets and moons, nebulae, and widefield panoramas.
+
+You can check out some examples of sharp Star in action [here](#results).
 
 ## Table of Contents
 
@@ -21,8 +23,10 @@
 - [Dataset](#dataset)
 - [Evaluation](#evaluation)
 - [Results](#results)
+- [Roadmap](#roadmap)
 - [Licence](#licence)
 
+<a name="installation"></a>
 ## Installation
 
 To get started, clone the repository:
@@ -130,7 +134,7 @@ You can get more info on configuring PRAW [here](https://praw.readthedocs.io/en/
 
 ## Evaluation
 
-The training is currently underway, but in the meantime, here are some graphs from wandb
+The training is currently underway, but in the meantime, here are some graphs from wandb 🙂
 
 ![](reports/figures/wandb.png)
 
@@ -140,6 +144,18 @@ Below you can see some examples of model outputs compared to the input and groun
 
 ![](reports/figures/figure1.png)
 Image Credit: [/u/carnage-chambers](https://www.reddit.com/r/astrophotography/comments/1k22wvz/the_merging_antennae_galaxies_in_corvus_ngc/)
+
+![](reports/figures/figure2.png)
+Image Credit: [/u/Dramatic_Expert_5092](https://www.reddit.com/r/spaceporn/comments/1k5hvls/the_elephants_trunk_nebula/)
+
+## Roadmap
+Here's what’s coming next (and what’s already done):
+
+- [x] Add `torch.compile`
+- [x] Implement mixed precision training
+- [ ] Clean patch seams in predicted images
+- [ ] Write docs
+- [ ] Release pre-trained weights
 
 ## Licence
 

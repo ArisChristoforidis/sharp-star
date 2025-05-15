@@ -11,10 +11,20 @@ app = typer.Typer()
 
 @app.command()
 def vizualize(
-    input_path: Annotated[str, typer.Option("--input", "-i")] = "data/splits/test/input/0.jpg",
-    ground_truth_path: Annotated[str | None, typer.Option("--ground", "-g")] = "data/splits/test/target/0.jpg",
-    model_path: Annotated[str, typer.Option("--model", "-m")] = "models/model.pth",
+    input_path: Annotated[str, typer.Option("--input", "-i")],
+    ground_truth_path: Annotated[str | None, typer.Option("--ground", "-g")],
+    model_path: Annotated[str, typer.Option("--model", "-m")],
 ) -> None:
+    """
+    Visualizes the input image, the model's predicted output, and optionally the ground truth image side by side.
+    Args:
+        input_path (str): Path to the input image file.
+        ground_truth_path (str | None): Path to the ground truth image file. If None, ground truth is not displayed.
+        model_path (str): Path to the trained model file.
+    Displays:
+        A matplotlib figure showing the input image, predicted output, and optionally the ground truth image.
+    """
+
     predicted_tensor = predict(input_path, None, model_path)
     input_image = np.array(Image.open(input_path))
     prediction_image = predicted_tensor.permute(1, 2, 0).numpy()

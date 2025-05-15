@@ -23,15 +23,27 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.ba
 
 @app.command()
 def train(
-    checkpoint: Annotated[str, typer.Option("--checkpoint", "-c")] = None,
-    train_path: Annotated[str, typer.Option("--train", "-t")] = "data/reduced/train",
-    eval_path: Annotated[str, typer.Option("--eval", "-v")] = "data/reduced/eval",
-    output_path: Annotated[str, typer.Option("--output", "-o")] = "models/model.pth",
+    checkpoint: Annotated[str, typer.Option("--checkpoint", "-c")],
+    train_path: Annotated[str, typer.Option("--train", "-t")],
+    eval_path: Annotated[str, typer.Option("--eval", "-v")],
+    output_path: Annotated[str, typer.Option("--output", "-o")],
     lr: Annotated[float, typer.Option("--learning_rate", "-lr")] = 1e-5,
     batch_size: Annotated[int, typer.Option("--batch", "-b")] = 32,
     epochs: Annotated[int, typer.Option("--epochs", "-e")] = 10,
     log_metrics: Annotated[bool, typer.Option("--log", "-l")] = True,
 ) -> None:
+    """
+    Trains a UNet model for image-to-image tasks with optional checkpoint resumption and metric logging.
+    Args:
+        checkpoint (str, optional): Path to a checkpoint file to resume training from.
+        train_path (str): Path to the training dataset.
+        eval_path (str): Path to the evaluation dataset.
+        output_path (str): Path to save the trained model checkpoint.
+        lr (float): Learning rate for the optimizer. Defaults to 1e-5.
+        batch_size (int): Batch size for training. Defaults to 32.
+        epochs (int): Number of training epochs. Defaults to 10.
+        log_metrics (bool): Whether to log metrics using Weights & Biases (wandb). Defaults to True.
+    """
     original_model = UNet(in_channels=3, out_channels=3)
     optimizer = Adam(original_model.parameters(), lr=lr)
     scheduler = ReduceLROnPlateau(optimizer, "min", patience=5)

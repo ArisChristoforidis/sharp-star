@@ -32,6 +32,7 @@ def evaluate(
         model_path (str): Path to the model checkpoint file. Defaults to 'models/model.pth'.
         eval_path (str): Path to the evaluation dataset. Defaults to "data/splits/eval".
         batch_size (int): Batch size for evaluation. Defaults to 8.
+        verbose (bool): If true, prints metrics.
     Returns:
         tuple: A tuple containing:
             - average_l1 (float): Average L1 loss over the evaluation dataset.

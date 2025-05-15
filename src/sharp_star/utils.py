@@ -9,7 +9,7 @@ from torchvision.io import read_image
 from tqdm import tqdm
 
 
-def calculate_mean_std(data_path, n_samples: int = 100):
+def calculate_mean_std(data_path: str, n_samples: int = 100):
     """
     Calculates the mean and standard deviation of the dataset located at the specified path.
     Args:
@@ -53,7 +53,7 @@ def calculate_mean_std(data_path, n_samples: int = 100):
     return mean, std
 
 
-def split_image(image: np.ndarray, patch_size=256):
+def split_image(image: np.ndarray, patch_size: int = 256):
     """
     Split an image into patches of a specified size.
 
