@@ -95,7 +95,7 @@ def train(
     for epoch in range(start_epoch, start_epoch + epochs):
         original_model.train()
         for i, (input_image, target_image) in tqdm(
-            enumerate(train_loader), desc=f"Training epoch {epoch+1}", total=len(train_loader)
+            enumerate(train_loader), desc=f"Training epoch {epoch + 1}", total=len(train_loader)
         ):
             input_image, target_image = input_image.to(DEVICE), target_image.to(DEVICE)
             optimizer.zero_grad()
