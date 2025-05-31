@@ -4,7 +4,7 @@ from typing import Annotated, List, Tuple
 import torch
 import typer
 from denormalize import Denormalize
-from model import UNet
+from model import Generator
 from torchvision import transforms
 from torchvision.io import read_image
 from torchvision.transforms.functional import to_pil_image
@@ -61,7 +61,7 @@ def predict(
     """
     checkpoint = torch.load(model_path, map_location="cpu")
 
-    model = UNet(in_channels=3, out_channels=3)
+    model = Generator(in_channels=3, out_channels=3)
     model.load_state_dict(checkpoint["model_state_dict"])
 
     mean = torch.tensor(checkpoint["mean"])

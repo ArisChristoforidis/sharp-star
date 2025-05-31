@@ -3,7 +3,7 @@ from typing import Annotated
 import torch
 import torch.nn as nn
 import typer
-from model import UNet
+from model import Generator
 from torch.nn.functional import l1_loss
 from torch.utils.data import DataLoader
 from torchmetrics.image.psnr import PeakSignalNoiseRatio
@@ -42,16 +42,16 @@ def evaluate(
 
     checkpoint = torch.load(model_path, map_location="cpu")
 
-    model = UNet(in_channels=3, out_channels=3)
-    model.load_state_dict(checkpoint["model_state_dict"])
+    generator = Generator(in_channels=3, out_channels=3)
+    generator.load_state_dict(checkpoint["model_state_dict"])
 
     mean = torch.tensor(checkpoint["mean"])
     std = torch.tensor(checkpoint["std"])
     eval_set = make_dataset(eval_path, mean, std)
 
-    model.eval()
+    generator.eval()
     # model = torch.compile(model)
-    model.to(DEVICE)
+    generator.to(DEVICE)
 
     psnr = PeakSignalNoiseRatio().to(DEVICE)
     ssim = StructuralSimilarityIndexMeasure().to(DEVICE)
@@ -61,7 +61,7 @@ def evaluate(
     with torch.no_grad():
         for i, (inputs, targets) in tqdm(enumerate(eval_loader), desc=f"Evaluating model", total=len(eval_loader)):
             inputs, targets = inputs.to(DEVICE), targets.to(DEVICE)
-            preds = model(inputs)
+            preds = generator(inputs)
 
             loss_l1 = l1_loss(preds, targets)
             psnr_val = psnr(preds, targets)

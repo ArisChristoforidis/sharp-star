@@ -2,16 +2,25 @@ import torch
 from torch import nn
 
 
+class ConvolutionBlock(nn.Module):
+    def __init__(self, in_channels: int, out_channels: int, kernel_size: int, padding: int, bias: bool):
+        super(ConvolutionBlock, self).__init__()
+        self.net = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size, padding=padding, bias=bias),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
+
 class DoubleConv(nn.Module):
     def __init__(self, in_channels: int, out_channels: int):
         super(DoubleConv, self).__init__()
         self.net = nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1, bias=False),
-            nn.BatchNorm2d(out_channels),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1, bias=False),
-            nn.BatchNorm2d(out_channels),
-            nn.ReLU(inplace=True),
+            ConvolutionBlock(in_channels, out_channels, kernel_size=3, padding=1, bias=False),
+            ConvolutionBlock(out_channels, out_channels, kernel_size=3, padding=1, bias=False),
         )
 
     def forward(self, x):
@@ -42,9 +51,9 @@ class Up(nn.Module):
         return x
 
 
-class UNet(nn.Module):
+class Generator(nn.Module):
     def __init__(self, in_channels: int, out_channels: int, base_features: int = 32):
-        super(UNet, self).__init__()
+        super(Generator, self).__init__()
 
         self.in_conv = DoubleConv(in_channels, base_features)
         self.down1 = Down(base_features, base_features * 2)
@@ -73,9 +82,35 @@ class UNet(nn.Module):
         return logits
 
 
+class Discriminator(nn.Module):
+    def __init__(self, in_channels: int, base_features: int = 32):
+        super(Discriminator, self).__init__()
+        self.net = nn.Sequential(
+            nn.Conv2d(in_channels * 2, base_features, kernel_size=3, padding=1),
+            nn.ReLU(),
+            ConvolutionBlock(base_features, base_features * 2, kernel_size=3, padding=1, bias=False),
+            ConvolutionBlock(base_features * 2, base_features * 4, kernel_size=3, padding=1, bias=False),
+            ConvolutionBlock(base_features * 4, base_features * 8, kernel_size=3, padding=1, bias=False),
+            nn.Conv2d(base_features * 8, 1, kernel_size=3, padding=1),
+        )
+
+    def forward(self, x, y):
+        return self.net(torch.cat([x, y], dim=1))
+
+
 if __name__ == "__main__":
-    x = torch.rand(8, 3, 64, 64)
-    model = UNet(in_channels=3, out_channels=3)
-    print(f"Model Parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
-    print(f"[UNet] Input shape: {x.shape}")
-    print(f"[UNet] Output shape: {model(x).shape}")
+    generator_input = torch.rand(8, 3, 64, 64)
+    generator = Generator(in_channels=3, out_channels=3)
+
+    discriminator_input_1 = torch.rand(8, 3, 64, 64)
+    discriminator_input_2 = torch.rand(8, 3, 64, 64)
+    discriminator = Discriminator(in_channels=3)
+
+    print(f"Generator Parameters: {sum(p.numel() for p in generator.parameters() if p.requires_grad)}")
+    print(f"[Generator] Input shape: {generator_input.shape}")
+    print(f"[Generator] Output shape: {generator(generator_input).shape}")
+
+    print(f"Discriminator Parameters: {sum(p.numel() for p in discriminator.parameters() if p.requires_grad)}")
+    print(f"[Discriminator] Input 1 shape: {discriminator_input_1.shape}")
+    print(f"[Discriminator] Input 2 shape: {discriminator_input_2.shape}")
+    print(f"[Discriminator] Output shape: {discriminator(discriminator_input_1, discriminator_input_2).shape}")
