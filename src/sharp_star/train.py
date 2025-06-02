@@ -46,8 +46,9 @@ def train(
         log_metrics (bool): Whether to log metrics using Weights & Biases (wandb). Defaults to True.
         autocast (bool): Whether to use mixed precision with autocast or not. Defaults to False
     """
-    original_model = UNet(in_channels=3, out_channels=3)
-    optimizer = Adam(original_model.parameters(), lr=lr)
+
+    model = UNet(in_channels=3, out_channels=3)
+    optimizer = Adam(model.parameters(), lr=lr)
     scheduler = ReduceLROnPlateau(optimizer, "min", patience=5)
     scaler = torch.GradScaler(device=str(DEVICE))
     l1_loss = L1Loss()
@@ -55,11 +56,10 @@ def train(
     if checkpoint:
         checkpoint_data = torch.load(checkpoint, map_location="cpu")
 
-        original_model.load_state_dict(checkpoint_data["model_state_dict"])
+        model.load_state_dict(checkpoint_data["model_state_dict"])
         optimizer.load_state_dict(checkpoint_data["optimizer_state_dict"])
         scheduler.load_state_dict(checkpoint_data["scheduler_state_dict"])
         scaler.load_state_dict(checkpoint_data["scaler_state_dict"])
-
         mean = torch.tensor(checkpoint_data["mean"])
         std = torch.tensor(checkpoint_data["std"])
 
@@ -71,17 +71,17 @@ def train(
         mean, std = calculate_mean_std(train_path)
         wandb_id = None
 
-    original_model = original_model.to(DEVICE)
-    compiled_model = torch.compile(original_model)
+    model = model.to(DEVICE)
+    compiled_model = torch.compile(model)
 
     # Check if optimizer_state_dict was actually loaded.
     if checkpoint:
-        print(f"Moving optimizer state to {DEVICE}...")
+        print(f"Moving optimizer states to {DEVICE}...")
         for state in optimizer.state.values():
             for k, v in state.items():
                 if isinstance(v, torch.Tensor):
                     state[k] = v.to(DEVICE)
-        print(f"Optimizer state successfully moved to {DEVICE}.")
+        print(f"Optimizer states successfully moved to {DEVICE}.")
 
     train_set = make_dataset(train_path, mean, std)
     train_loader = DataLoader(train_set, batch_size=batch_size, num_workers=4)
@@ -95,7 +95,7 @@ def train(
         )
 
     for epoch in range(start_epoch, start_epoch + epochs):
-        original_model.train()
+        model.train()
         for i, (input_image, target_image) in tqdm(
             enumerate(train_loader), desc=f"Training epoch {epoch + 1}", total=len(train_loader)
         ):
@@ -110,15 +110,15 @@ def train(
             if autocast:
                 scaler.scale(loss).backward()
                 scaler.unscale_(optimizer)
-                clip_grad_norm_(original_model.parameters(), 1.0)
+                clip_grad_norm_(model.parameters(), 1.0)
                 scaler.step(optimizer)
                 scaler.update()
             else:
                 loss.backward()
                 optimizer.step()
 
-        new_checkpoint = {
-            "model_state_dict": original_model.state_dict(),
+        checkpoint = {
+            "model_state_dict": model.state_dict(),
             "optimizer_state_dict": optimizer.state_dict(),
             "scheduler_state_dict": scheduler.state_dict(),
             "scaler_state_dict": scaler.state_dict(),
@@ -128,12 +128,13 @@ def train(
         }
 
         if log_metrics:
-            new_checkpoint["wandb_id"] = metrics.id
+            checkpoint["wandb_id"] = metrics.id
 
         torch.save(
-            new_checkpoint,
-            output_path,
+            checkpoint,
+            os.join(output_path, "model.pth"),
         )
+
         # Evaluate and log.
         eval_l1, psnr, ssim = evaluate(model_path=output_path, eval_path=eval_path, verbose=False)
         scheduler.step(eval_l1)

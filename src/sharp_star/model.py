@@ -2,16 +2,25 @@ import torch
 from torch import nn
 
 
+class ConvolutionBlock(nn.Module):
+    def __init__(self, in_channels: int, out_channels: int, kernel_size: int, padding: int, bias: bool):
+        super(ConvolutionBlock, self).__init__()
+        self.net = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size, padding=padding, bias=bias),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
+
 class DoubleConv(nn.Module):
     def __init__(self, in_channels: int, out_channels: int):
         super(DoubleConv, self).__init__()
         self.net = nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1, bias=False),
-            nn.BatchNorm2d(out_channels),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1, bias=False),
-            nn.BatchNorm2d(out_channels),
-            nn.ReLU(inplace=True),
+            ConvolutionBlock(in_channels, out_channels, kernel_size=3, padding=1, bias=False),
+            ConvolutionBlock(out_channels, out_channels, kernel_size=3, padding=1, bias=False),
         )
 
     def forward(self, x):
@@ -76,8 +85,9 @@ class UNet(nn.Module):
 
 
 if __name__ == "__main__":
-    x = torch.rand(8, 3, 64, 64)
+    model_input = torch.rand(8, 3, 64, 64)
     model = UNet(in_channels=3, out_channels=3)
+
     print(f"Model Parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
-    print(f"[UNet] Input shape: {x.shape}")
-    print(f"[UNet] Output shape: {model(x).shape}")
+    print(f"Input shape: {model_input.shape}")
+    print(f"Output shape: {model(model_input).shape}")
