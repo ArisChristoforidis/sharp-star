@@ -21,7 +21,8 @@ def stitch_image(original_shape: Tuple[int, int], patches: List[torch.tensor], p
     Reconstructs an image from a list of patches.
     Args:
         original_shape (Tuple[int, int]): The shape of the original image as (channels, height, width).
-        patches (List[torch.Tensor]): A list of image patches as tensors, each of shape (channels, patch_size, patch_size).
+        patches (List[torch.Tensor]): A list of image patches as tensors, each
+            of shape (channels, patch_size, patch_size).
         patch_size (int): The size of each square patch.
     Returns:
         torch.Tensor: The reconstructed image tensor of shape (channels, height, width), cropped to the original size.
@@ -49,7 +50,8 @@ def predict(
     patch_size: Annotated[int, typer.Option("--patch", "-p")] = 256,
 ) -> None:
     """
-    Runs inference on an input image using a pre-trained UNet model, processes the image in patches, and optionally saves the output.
+    Runs inference on an input image using a pre-trained UNet model, processes
+    the image in patches, and optionally saves the output.
     Args:
         image_path (str): Path to the input image file.
         output_path (str | None): Path to save the output image. If None, the output is not saved.
@@ -74,7 +76,7 @@ def predict(
     output_transform = Denormalize(mean=mean, std=std)
 
     image = read_image(image_path) / 255.0
-    image = input_transform(image)
+    # image = input_transform(image)
     image_patches = split_image(image, patch_size)
 
     output_patches = []
@@ -86,7 +88,7 @@ def predict(
         output_patches.extend(out.unbind(0))
     out_image = stitch_image(image.shape, output_patches, patch_size)
 
-    out_image = output_transform(out_image)
+    # out_image = output_transform(out_image)
     if output_path:
         image_to_save = (out_image * 255).clamp(0, 255).byte()
         pil_image = to_pil_image(image_to_save)

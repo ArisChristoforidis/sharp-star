@@ -57,6 +57,7 @@ class UNet(nn.Module):
         self.up3 = Up(base_features * 4, base_features * 2, base_features * 2)
         self.up4 = Up(base_features * 2, base_features, base_features)
         self.out_conv = nn.Conv2d(base_features, out_channels, kernel_size=1)
+        self.out_sigmoid = nn.Sigmoid()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x1 = self.in_conv(x)
@@ -69,7 +70,8 @@ class UNet(nn.Module):
         x = self.up2(x, x3)
         x = self.up3(x, x2)
         x = self.up4(x, x1)
-        logits = self.out_conv(x)
+        x = self.out_conv(x)
+        logits = self.out_sigmoid(x)
         return logits
 
 

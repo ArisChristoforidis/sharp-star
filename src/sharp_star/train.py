@@ -23,26 +23,28 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.ba
 
 @app.command()
 def train(
-    checkpoint: Annotated[str, typer.Option("--checkpoint", "-c")],
     train_path: Annotated[str, typer.Option("--train", "-t")],
     eval_path: Annotated[str, typer.Option("--eval", "-v")],
     output_path: Annotated[str, typer.Option("--output", "-o")],
-    lr: Annotated[float, typer.Option("--learning_rate", "-lr")] = 1e-5,
+    checkpoint: Annotated[str, typer.Option("--checkpoint", "-c")] = None,
+    lr: Annotated[float, typer.Option("--learning_rate", "-lr")] = 1e-3,
     batch_size: Annotated[int, typer.Option("--batch", "-b")] = 32,
     epochs: Annotated[int, typer.Option("--epochs", "-e")] = 10,
     log_metrics: Annotated[bool, typer.Option("--log", "-l")] = True,
+    autocast: Annotated[bool, typer.Option("--autocast", "-a")] = False,
 ) -> None:
     """
     Trains a UNet model for image-to-image tasks with optional checkpoint resumption and metric logging.
     Args:
-        checkpoint (str, optional): Path to a checkpoint file to resume training from.
         train_path (str): Path to the training dataset.
         eval_path (str): Path to the evaluation dataset.
         output_path (str): Path to save the trained model checkpoint.
+        checkpoint (str, optional): Path to a checkpoint file to resume training from. Defaults to None
         lr (float): Learning rate for the optimizer. Defaults to 1e-5.
         batch_size (int): Batch size for training. Defaults to 32.
         epochs (int): Number of training epochs. Defaults to 10.
         log_metrics (bool): Whether to log metrics using Weights & Biases (wandb). Defaults to True.
+        autocast (bool): Whether to use mixed precision with autocast or not. Defaults to False
     """
     original_model = UNet(in_channels=3, out_channels=3)
     optimizer = Adam(original_model.parameters(), lr=lr)
@@ -100,16 +102,20 @@ def train(
             input_image, target_image = input_image.to(DEVICE), target_image.to(DEVICE)
             optimizer.zero_grad()
             # Forward pass
-            with torch.autocast(device_type=str(DEVICE), dtype=torch.float16):
+            with torch.autocast(device_type=str(DEVICE), dtype=torch.float16, enabled=autocast):
                 pred_image = compiled_model(input_image)
                 loss = l1_loss(pred_image, target_image)
 
             # Back pass
-            scaler.scale(loss).backward()
-            scaler.unscale_(optimizer)
-            clip_grad_norm_(original_model.parameters(), 1.0)
-            scaler.step(optimizer)
-            scaler.update()
+            if autocast:
+                scaler.scale(loss).backward()
+                scaler.unscale_(optimizer)
+                clip_grad_norm_(original_model.parameters(), 1.0)
+                scaler.step(optimizer)
+                scaler.update()
+            else:
+                loss.backward()
+                optimizer.step()
 
         new_checkpoint = {
             "model_state_dict": original_model.state_dict(),
@@ -144,4 +150,4 @@ def train(
 
 
 if __name__ == "__main__":
-    train()
+    train(train_path="data/reduced/train", eval_path="data/reduced/eval", output_path="models/model.pth")

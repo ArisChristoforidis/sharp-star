@@ -54,7 +54,7 @@ def make_dataset(path: str, mean: torch.Tensor, std: torch.Tensor) -> AstroDatas
         AstroDataset: The dataset.
     """
     normalize = transforms.Normalize(mean=mean, std=std)
-    dataset = AstroDataset(path, transform=normalize)
+    dataset = AstroDataset(path, transform=None)
     return dataset
 
 
