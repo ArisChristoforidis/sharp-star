@@ -52,6 +52,7 @@ def train(
     scheduler = ReduceLROnPlateau(optimizer, "min", patience=5)
     scaler = torch.GradScaler(device=str(DEVICE))
     l1_loss = L1Loss()
+    model_path = os.path.join(output_path, "model.pth")
 
     if checkpoint:
         checkpoint_data = torch.load(checkpoint, map_location="cpu")
@@ -130,13 +131,10 @@ def train(
         if log_metrics:
             checkpoint["wandb_id"] = metrics.id
 
-        torch.save(
-            checkpoint,
-            os.join(output_path, "model.pth"),
-        )
+        torch.save(checkpoint, model_path)
 
         # Evaluate and log.
-        eval_l1, psnr, ssim = evaluate(model_path=output_path, eval_path=eval_path, verbose=False)
+        eval_l1, psnr, ssim = evaluate(model_path=model_path, eval_path=eval_path, verbose=False)
         scheduler.step(eval_l1)
 
         if log_metrics:

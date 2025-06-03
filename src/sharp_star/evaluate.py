@@ -3,7 +3,7 @@ from typing import Annotated
 import torch
 import torch.nn as nn
 import typer
-from model import Generator
+from model import UNet
 from torch.nn.functional import l1_loss
 from torch.utils.data import DataLoader
 from torchmetrics.image.psnr import PeakSignalNoiseRatio
@@ -42,7 +42,7 @@ def evaluate(
 
     checkpoint = torch.load(model_path, map_location="cpu")
 
-    generator = Generator(in_channels=3, out_channels=3)
+    generator = UNet(in_channels=3, out_channels=3)
     generator.load_state_dict(checkpoint["model_state_dict"])
 
     mean = torch.tensor(checkpoint["mean"])
