@@ -13,7 +13,7 @@ app = typer.Typer()
 def vizualize(
     input_path: Annotated[str, typer.Option("--input", "-i")],
     ground_truth_path: Annotated[str | None, typer.Option("--ground", "-g")],
-    model_path: Annotated[str, typer.Option("--model", "-m")],
+    model_path: Annotated[str, typer.Option("--model", "-m")] = "models/model.pth",
 ) -> None:
     """
     Visualizes the input image, the model's predicted output, and optionally the ground truth image side by side.

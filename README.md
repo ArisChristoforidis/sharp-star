@@ -21,7 +21,6 @@ You can check out some examples of sharp Star in action [here](#results).
   - [Training](#training)
   - [Visualization](#visualization)
 - [Dataset](#dataset)
-- [Evaluation](#evaluation)
 - [Results](#results)
 - [Roadmap](#roadmap)
 - [Licence](#licence)
@@ -132,12 +131,6 @@ REDDIT_PASSWORD=
 
 You can get more info on configuring PRAW [here](https://praw.readthedocs.io/en/stable/getting_started/authentication.html)
 
-## Evaluation
-
-The training is currently underway, but in the meantime, here are some graphs from wandb 🙂
-
-![](reports/figures/wandb.png)
-
 ## Results
 
 Below you can see some examples of model outputs compared to the input and ground truth images.
@@ -145,8 +138,8 @@ Below you can see some examples of model outputs compared to the input and groun
 ![](reports/figures/figure1.png)
 Image Credit: [/u/carnage-chambers](https://www.reddit.com/r/astrophotography/comments/1k22wvz/the_merging_antennae_galaxies_in_corvus_ngc/)
 
-![](reports/figures/figure2.png)
-Image Credit: [/u/Dramatic_Expert_5092](https://www.reddit.com/r/spaceporn/comments/1k5hvls/the_elephants_trunk_nebula/)
+![](reports/figures/figure3.png)
+Image Credit: [/u/Chris9712](https://www.reddit.com/r/astrophotography/comments/guvcip/a_04_crescent_venus_during_the_day/)
 
 ## Roadmap
 Here's what’s coming next (and what’s already done):
@@ -156,6 +149,7 @@ Here's what’s coming next (and what’s already done):
 - [ ] Clean patch seams in predicted images
 - [ ] Write docs
 - [ ] Release pre-trained weights
+- [ ] Deploy as a web app (maybe)
 
 ## Licence
 
