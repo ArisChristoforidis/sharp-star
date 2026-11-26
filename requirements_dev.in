@@ -1,0 +1,30 @@
+# Development dependencies. Edit THIS file, then regenerate the lock with:
+#   uv pip compile requirements_dev.in --universal --python-version 3.11 -c requirements.txt -o requirements_dev.txt
+
+# commands
+invoke
+
+# pre-commit
+pre-commit
+virtualenv>=21.14.10
+
+# testing
+pytest>=9.0.3
+coverage
+
+# linting
+ruff
+
+# docs
+mkdocs
+mkdocs-material
+mkdocstrings-python
+
+# notebooks (dataset fetching in notebooks/01-fetch-dataset.ipynb)
+ipykernel
+ipython
+praw
+python-dotenv>=1.2.2
+requests>=2.33.0
+tornado>=6.6.1
+jupyter-core>=5.8.1
