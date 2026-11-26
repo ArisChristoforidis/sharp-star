@@ -3,6 +3,8 @@ from typing import Annotated
 
 import torch
 import typer
+import wandb
+from data import make_dataset
 from evaluate import evaluate
 from model import UNet
 from torch.nn import L1Loss
@@ -12,9 +14,6 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from utils import calculate_mean_std
-
-import wandb
-from data import make_dataset
 
 app = typer.Typer()
 

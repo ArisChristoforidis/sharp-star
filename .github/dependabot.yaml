@@ -1,13 +1,15 @@
 version: 2
 updates:
+  # Dependabot detects requirements*.in + requirements*.txt as pip-compile files
+  # and regenerates the lock files together.
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "monthly"
-  - package-ecosystem: "uv"
-    directory: "/"
-    schedule:
-      interval: "monthly"
+      interval: "weekly"
+    groups:
+      python-deps:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

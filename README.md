@@ -44,6 +44,14 @@ venv\Scripts\activate  # On Windows
 pip install -r requirements.txt
 ```
 
+Requires Python 3.11+. `requirements.txt` / `requirements_dev.txt` are generated lock files; to add or change a
+dependency, edit `requirements.in` / `requirements_dev.in` and regenerate:
+
+```bash
+uv pip compile requirements.in --universal --python-version 3.11 -o requirements.txt
+uv pip compile requirements_dev.in --universal --python-version 3.11 -c requirements.txt -o requirements_dev.txt
+```
+
 ## Usage
 
 ### Inference
