@@ -3,6 +3,8 @@ from typing import Annotated
 import torch
 import torch.nn as nn
 import typer
+import wandb
+from data import make_dataset
 from model import UNet
 from torch.nn.functional import l1_loss
 from torch.utils.data import DataLoader
@@ -10,9 +12,6 @@ from torchmetrics.image.psnr import PeakSignalNoiseRatio
 from torchmetrics.image.ssim import StructuralSimilarityIndexMeasure
 from torchvision import transforms
 from tqdm import tqdm
-
-import wandb
-from data import make_dataset
 
 app = typer.Typer()
 
